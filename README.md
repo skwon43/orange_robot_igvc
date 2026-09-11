@@ -141,3 +141,4 @@ hyoon/sim-sensor-contract
 ```
 
 Simulation changes should be validated in Docker before being proposed for merge into the main project branch. Higher-level lane detection, obstacle processing, NVBlox, SLAM, Nav2, and autonomous course execution should build on the verified sensor interface rather than silently changing it.
+# orange_robot_igvc
