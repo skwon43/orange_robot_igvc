@@ -125,10 +125,12 @@ ros2 launch orange_gazebo orange_igvc_baseline.launch.xml
 
 See:
 
+- [`docs/REPOSITORY_STRUCTURE.md`](docs/REPOSITORY_STRUCTURE.md) - package ownership, supported entry points, and restructuring rules
+
 - [`docs/SENSOR_DEMO_CHECKPOINT.md`](docs/SENSOR_DEMO_CHECKPOINT.md) — frozen September 5, 2026 student-shareable sensor-demo checkpoint
 - [`docs/SIM_BASELINE.md`](docs/SIM_BASELINE.md) — reproducible Docker / ROS 2 / Gazebo baseline and validation history
 - [`docs/IGVC_2026_COURSE_SPEC.md`](docs/IGVC_2026_COURSE_SPEC.md) — deterministic 2026 IGVC course specification
-- [`orange_ros2/README.md`](orange_ros2/README.md) — upstream Orange ROS 2 package documentation
+- [`docs/ORANGE_ROS2_UPSTREAM.md`](docs/ORANGE_ROS2_UPSTREAM.md) — upstream Orange ROS 2 package documentation
 
 ## Development
 

@@ -91,11 +91,11 @@ def parse_args() -> argparse.Namespace:
     repo_root = Path(__file__).resolve().parents[1]
     default_input = (
         repo_root
-        / "orange_ros2/orange_gazebo/models/orange_igvc/model.sdf"
+        / "src/orange_gazebo/models/orange_igvc/model.sdf"
     )
     default_output_dir = (
         repo_root
-        / "orange_ros2/orange_gazebo/models/orange_igvc_2026"
+        / "src/orange_gazebo/models/orange_igvc_2026"
     )
 
     parser = argparse.ArgumentParser(description=__doc__)

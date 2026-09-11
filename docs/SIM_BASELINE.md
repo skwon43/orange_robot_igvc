@@ -193,14 +193,14 @@ Therefore the Compose path reproduces the same GPU-accelerated X11/OpenGL enviro
 Running `colcon list` from `/workspace` in the Compose container successfully discovered the eight ROS 2 packages currently stored in this repository:
 
 ```text
-orange_bringup       orange_ros2/orange_bringup       (ros.ament_python)
-orange_description   orange_ros2/orange_description   (ros.ament_cmake)
-orange_gazebo        orange_ros2/orange_gazebo        (ros.ament_cmake)
-orange_navigation    orange_ros2/orange_navigation    (ros.ament_cmake)
-orange_sensor_tools  orange_ros2/orange_sensor_tools  (ros.ament_cmake)
-orange_slam          orange_ros2/orange_slam          (ros.ament_cmake)
-orange_teleop        orange_ros2/orange_teleop        (ros.ament_python)
-serial               serial                            (ros.ament_cmake)
+orange_bringup       src/orange_bringup       (ros.ament_python)
+orange_description   src/orange_description   (ros.ament_cmake)
+orange_gazebo        src/orange_gazebo        (ros.ament_cmake)
+orange_navigation    src/orange_navigation    (ros.ament_cmake)
+orange_sensor_tools  src/orange_sensor_tools  (ros.ament_cmake)
+orange_slam          src/orange_slam          (ros.ament_cmake)
+orange_teleop        src/orange_teleop        (ros.ament_python)
+serial               src/serial               (ros.ament_cmake)
 ```
 
 This confirms that the repository root can be used directly as the colcon workspace root; the packages do not need to be moved under an additional `src/` directory for the current baseline.
@@ -214,11 +214,11 @@ The simulation-core dependency set was checked with:
 ```bash
 rosdep check \
   --from-paths \
-    orange_ros2/orange_description \
-    orange_ros2/orange_gazebo \
-    orange_ros2/orange_sensor_tools \
-    orange_ros2/orange_teleop \
-    serial \
+    src/orange_description \
+    src/orange_gazebo \
+    src/orange_sensor_tools \
+    src/orange_teleop \
+    src/serial \
   --ignore-src \
   -r
 ```
@@ -381,8 +381,17 @@ orange_robot_igvc/
 ├── tools/
 │   ├── generate_igvc_2026_course.py
 │   └── igvc_shell.sh
-├── orange_ros2/
-└── serial/
+├── deps/
+│   └── orange_ros2.rosinstall
+└── src/
+  ├── orange_bringup/
+  ├── orange_description/
+  ├── orange_gazebo/
+  ├── orange_navigation/
+  ├── orange_sensor_tools/
+  ├── orange_slam/
+  ├── orange_teleop/
+  └── serial/
 ```
 
 Docker/runtime configuration is kept outside the ROS package tree.
