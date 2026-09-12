@@ -35,7 +35,7 @@ ament_target_dependencies(laserscan_multi_merger
   pcl_ros
 )
 target_include_directories(laserscan_multi_merger PUBLIC ${PCL_INCLUDE_DIRS})
-target_link_libraries(laserscan_multi_merger PUBLIC ${PCL_LIBRARIES})
+target_link_libraries(laserscan_multi_merger ${PCL_LIBRARIES})
 install(TARGETS laserscan_multi_merger DESTINATION lib/${PROJECT_NAME})
 
 add_executable(led_node src/led_node.cpp)
