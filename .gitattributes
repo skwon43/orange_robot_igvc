@@ -1,0 +1,9 @@
+*.sh text eol=lf
+*.py text eol=lf
+*.xml text eol=lf
+*.xacro text eol=lf
+*.gazebo text eol=lf
+*.sdf text eol=lf
+*.world text eol=lf
+*.yaml text eol=lf
+*.lua text eol=lf
