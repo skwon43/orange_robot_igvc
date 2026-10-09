@@ -30,6 +30,7 @@ setup(
     entry_points={
         "console_scripts": [
             "teleop_twist_keyboard = orange_teleop.teleop_twist_keyboard:main",
+            "straight_line_tester = orange_teleop.straight_line_tester:main",
         ],
     },
 )

@@ -9,6 +9,7 @@
   <maintainer email="kimihiro.mori.4k@stu.hosei.ac.jp">Mori</maintainer>
   <license>Apache-2.0</license>
   <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
   <depend>rclpy</depend>
   <depend>teleop_twist_joy</depend>
   <depend>xterm</depend>
