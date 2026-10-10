@@ -40,6 +40,30 @@ For a non-GUI simulation shell, use:
 igvc-sim
 ```
 
+### Windows with WSLg
+
+WSLg and Docker Desktop's WSL integration are required. Open the Ubuntu 22.04
+WSL terminal (not PowerShell), then run:
+
+```bash
+cd "/mnt/c/Users/<your-windows-user>/OneDrive/바탕 화면/Project H&Y/orange_robot_igvc-main"
+source tools/igvc_shell.sh
+```
+
+Build after source changes and launch the GUI sensor demo from that same WSL
+terminal:
+
+```bash
+docker compose -f compose.sim.yaml run --rm sim bash -lc \
+  "source /opt/ros/humble/setup.bash && colcon build --symlink-install --packages-up-to orange_gazebo orange_teleop orange_lane_perception"
+igvc-demo
+```
+
+Run Compose from WSL so it inherits WSLg's `DISPLAY` and X11 socket. Running
+the GUI launch directly from PowerShell does not provide those display
+settings. WSLg provides the GUI display; the container can still use software
+OpenGL rendering depending on the installed WSL graphics drivers.
+
 ### First Build or After Source Changes
 
 Inside the simulation container:
@@ -49,7 +73,7 @@ cd /workspace
 
 colcon build \
   --symlink-install \
-  --packages-up-to orange_gazebo orange_teleop
+  --packages-up-to orange_gazebo orange_teleop orange_lane_perception
 
 source install/setup.bash
 ```
@@ -109,6 +133,10 @@ Primary ROS topics include:
 /zed/zed_node/depth/depth_registered
 /zed/zed_node/depth/camera_info
 /zed/zed_node/depth/points
+
+/perception/lane_center
+/perception/lane_diagnostics
+/perception/lane_mask
 ```
 
 The ZED depth point cloud is reconstructed with `depth_image_proc` from the bridged depth image and CameraInfo so that the PointCloud2 follows the ROS optical-frame convention.
@@ -128,6 +156,8 @@ See:
 - [`docs/REPOSITORY_STRUCTURE.md`](docs/REPOSITORY_STRUCTURE.md) - package ownership, supported entry points, and restructuring rules
 
 - [`docs/SENSOR_DEMO_CHECKPOINT.md`](docs/SENSOR_DEMO_CHECKPOINT.md) — frozen September 5, 2026 student-shareable sensor-demo checkpoint
+- [`docs/SENSOR_INTERFACE_CONTRACT.md`](docs/SENSOR_INTERFACE_CONTRACT.md) — canonical sensor/TF contract, physical mapping procedure, and lane-evaluation workflow
+- [`docs/SENSOR_VALIDATION_UPDATE.md`](docs/SENSOR_VALIDATION_UPDATE.md) — implementation report, verification evidence, and remaining validation work
 - [`docs/SIM_BASELINE.md`](docs/SIM_BASELINE.md) — reproducible Docker / ROS 2 / Gazebo baseline and validation history
 - [`docs/IGVC_2026_COURSE_SPEC.md`](docs/IGVC_2026_COURSE_SPEC.md) — deterministic 2026 IGVC course specification
 - [`docs/ORANGE_ROS2_UPSTREAM.md`](docs/ORANGE_ROS2_UPSTREAM.md) — upstream Orange ROS 2 package documentation

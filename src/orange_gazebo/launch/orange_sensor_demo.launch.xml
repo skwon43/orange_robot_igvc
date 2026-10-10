@@ -7,7 +7,7 @@
   <arg name="gazebo_follow_y" default="0.0"/>
   <arg name="gazebo_follow_z" default="3.0"/>
   <arg name="world_file_path"
-       default="$(find-pkg-share orange_gazebo)/worlds/orange_igvc.world"/>
+       default="$(find-pkg-share orange_gazebo)/worlds/orange_igvc_2026.world"/>
   <arg name="xacro_file_path"
        default="$(find-pkg-share orange_description)/xacro/orange_robot_simulation.xacro"/>
   <arg name="rviz_config_file"

@@ -3,7 +3,7 @@
   <arg name="use_sim_time" default="true"/>
   <arg name="headless" default="false"/>
   <arg name="world_file_path"
-       default="$(find-pkg-share orange_gazebo)/worlds/orange_igvc.world"/>
+       default="$(find-pkg-share orange_gazebo)/worlds/orange_igvc_2026.world"/>
   <arg name="xacro_file_path"
        default="$(find-pkg-share orange_description)/xacro/orange_robot_simulation.xacro"/>
 

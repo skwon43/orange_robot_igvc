@@ -10,6 +10,7 @@ src/
   orange_gazebo/        Gazebo worlds, models, and simulation entry points
   orange_teleop/        Teleoperation nodes and launch files
   orange_sensor_tools/  C++ sensor processing nodes and sensor configs
+  orange_lane_perception/ ROS 2 lane-perception baseline and CSV recorder
   orange_bringup/       Real-robot drivers and localization utilities
   orange_navigation/     Navigation configuration and launch files
   orange_slam/           SLAM configuration and launch files
@@ -54,10 +55,19 @@ Run these commands inside the simulation container after source changes:
 ```bash
 source /opt/ros/humble/setup.bash
 colcon list
-colcon build --symlink-install --packages-up-to orange_gazebo orange_teleop
+colcon build --symlink-install --packages-up-to orange_gazebo orange_teleop orange_lane_perception
 source install/setup.bash
 ros2 launch orange_gazebo orange_igvc_baseline.launch.xml
 ros2 launch orange_gazebo orange_sensor_demo.launch.xml
+ros2 launch orange_sensor_tools sensor_contract_validation.launch.xml profile:=simulation_demo
+ros2 launch orange_lane_perception lane_perception.launch.py
+ros2 launch orange_sensor_tools sensor_contract_validation.launch.xml profile:=simulation_perception
 ```
 
 Use `docs/SIM_BASELINE.md` and `docs/SENSOR_DEMO_CHECKPOINT.md` for the expected environment and sensor contract.
+Use `docs/SENSOR_INTERFACE_CONTRACT.md` for the executable contract checks and cross-platform lane comparison workflow.
+
+`orange_lane_perception` owns the ROS 2 baseline that turns front-camera lane
+observations into `/perception/lane_center` and records comparable `odom` CSV
+predictions. It may improve the detector internals, but must preserve the
+published topic, message type, and frame contract.

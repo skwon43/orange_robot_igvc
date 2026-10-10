@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="profile" default="simulation_baseline"/>
+  <arg name="validation_window_sec" default="10.0"/>
+  <arg name="report_path" default=""/>
+  <arg name="contract_file"
+       default="$(find-pkg-share orange_sensor_tools)/config/sensor_interface_contract.yaml"/>
+
+  <node pkg="orange_sensor_tools"
+        exec="sensor_contract_validator"
+        name="sensor_contract_validator"
+        output="screen">
+    <param name="contract_file" value="$(var contract_file)"/>
+    <param name="profile" value="$(var profile)"/>
+    <param name="validation_window_sec" value="$(var validation_window_sec)"/>
+    <param name="report_path" value="$(var report_path)"/>
+  </node>
+</launch>

@@ -161,6 +161,27 @@ for an interactive shell with temporary X11 access. `igvc-gui` grants `root` acc
 
 The helper automatically sources ROS 2 Humble and, when present, `/workspace/install/setup.bash` inside the container. It also determines the repository root from the helper script location, so users do not need to hard-code a local checkout path.
 
+### Windows with WSLg
+
+Windows hosts can use the Ubuntu 22.04 WSL2 distribution with WSLg and Docker
+Desktop's WSL integration. Run Docker Compose from the Ubuntu WSL terminal,
+where WSLg sets `DISPLAY` and provides `/tmp/.X11-unix`; do not launch the GUI
+container from PowerShell. The repository may remain on the Windows-mounted
+drive.
+
+From the repository root in WSL:
+
+```bash
+source tools/igvc_shell.sh
+docker compose -f compose.sim.yaml run --rm sim bash -lc \
+  "source /opt/ros/humble/setup.bash && colcon build --symlink-install --packages-up-to orange_gazebo orange_teleop"
+igvc-demo
+```
+
+`igvc-demo` launches `orange_sensor_demo.launch.xml`. Docker GPU visibility
+(`nvidia-smi`) does not guarantee hardware-accelerated OpenGL in WSLg; check
+`glxinfo -B` inside the container if rendering performance is poor.
+
 The equivalent manual workflow is:
 
 ```bash

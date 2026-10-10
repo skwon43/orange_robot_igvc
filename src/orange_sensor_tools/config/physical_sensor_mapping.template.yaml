@@ -1,0 +1,73 @@
+# Copy this file to physical_sensor_mapping.yaml after confirming the actual
+# device serial numbers, driver namespaces, and measured mounting transforms.
+# Do not copy the Gazebo poses into a physical robot configuration.
+contract_file: sensor_interface_contract.yaml
+
+sensors:
+  front_realsense:
+    enabled: false
+    expected_device: Intel RealSense D435i or confirmed replacement
+    driver: realsense2_camera
+    source_namespace: /front_realsense
+    canonical_outputs:
+      color_image: /camera_front/color/image_raw
+      color_info: /camera_front/color/camera_info
+      depth_image: /camera_front/depth/image_raw
+      depth_info: /camera_front/depth/camera_info
+    required_frame: camera_front_optical_frame
+    mount_transform:
+      parent_frame: base_link
+      child_frame: camera_front_optical_frame
+      translation_m: null
+      rotation_rpy_rad: null
+
+  rear_realsense:
+    enabled: false
+    expected_device: Intel RealSense D435i or confirmed replacement
+    driver: realsense2_camera
+    source_namespace: /rear_realsense
+    canonical_outputs:
+      color_image: /camera_rear/color/image_raw
+      color_info: /camera_rear/color/camera_info
+    required_frame: camera_rear_optical_frame
+    mount_transform:
+      parent_frame: base_link
+      child_frame: camera_rear_optical_frame
+      translation_m: null
+      rotation_rpy_rad: null
+
+  zed:
+    enabled: false
+    expected_device: ZED 2 or confirmed replacement
+    driver: zed_wrapper
+    source_namespace: /zed/zed_node
+    canonical_outputs:
+      color_image: /zed/zed_node/rgb/image_rect_color
+      color_info: /zed/zed_node/rgb/camera_info
+      depth_image: /zed/zed_node/depth/depth_registered
+      depth_info: /zed/zed_node/depth/camera_info
+    required_frame: zed_left_camera_optical_frame
+    mount_transform:
+      parent_frame: base_link
+      child_frame: zed_left_camera_optical_frame
+      translation_m: null
+      rotation_rpy_rad: null
+
+  lidar:
+    enabled: false
+    expected_device: Confirm physical LiDAR model or mark unsupported
+    driver: null
+    source_topic: null
+    canonical_output: /hokuyo_scan
+    required_frame: hokuyo
+    mount_transform:
+      parent_frame: base_link
+      child_frame: hokuyo
+      translation_m: null
+      rotation_rpy_rad: null
+
+base_state:
+  odometry_topic: /odom
+  transform_topic: /tf
+  joint_states_topic: /joint_states
+  command_topic: /cmd_vel
