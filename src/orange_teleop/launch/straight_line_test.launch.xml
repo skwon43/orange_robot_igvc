@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="target_speed" default="0.5"/>
+  <arg name="target_duration" default="10.0"/>
+  <arg name="cmd_vel_topic" default="/cmd_vel"/>
+  <arg name="odom_topic" default="/odom"/>
+
+  <node pkg="orange_teleop" exec="straight_line_tester" output="screen">
+    <param name="use_sim_time" value="true"/>
+    <param name="target_speed" value="$(var target_speed)"/>
+    <param name="target_duration" value="$(var target_duration)"/>
+    <param name="cmd_vel_topic" value="$(var cmd_vel_topic)"/>
+    <param name="odom_topic" value="$(var odom_topic)"/>
+  </node>
+</launch>
