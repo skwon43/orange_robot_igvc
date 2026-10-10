@@ -1,13 +1,19 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="use_sim_time" default="true"/>
+  <arg name="headless" default="false"/>
   <arg name="world_file_path"
        default="$(find-pkg-share orange_gazebo)/worlds/orange_igvc_2026.world"/>
   <arg name="xacro_file_path"
        default="$(find-pkg-share orange_description)/xacro/orange_robot_simulation.xacro"/>
 
   <!-- Minimal Gazebo Fortress baseline: world, robot, core ROS topics, and Competition-aligned sensor interfaces. -->
-  <include file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py">
+  <include file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py"
+           if="$(var headless)">
+    <arg name="gz_args" value="-s -r $(var world_file_path)"/>
+  </include>
+  <include file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py"
+           unless="$(var headless)">
     <arg name="gz_args" value="-r $(var world_file_path)"/>
   </include>
 
