@@ -1,0 +1,154 @@
+version: 1
+
+# Canonical ROS 2 interface consumed by perception, planning, and control.
+# Simulation drivers and physical drivers may differ internally, but both must
+# publish these names, types, frame IDs, and minimum observable rates.
+profiles:
+  simulation_baseline:
+    required_transforms:
+      - target_frame: odom
+        source_frame: base_footprint
+      - target_frame: base_link
+        source_frame: camera_front_optical_frame
+      - target_frame: base_link
+        source_frame: camera_rear_optical_frame
+      - target_frame: base_link
+        source_frame: zed_left_camera_optical_frame
+      - target_frame: base_link
+        source_frame: hokuyo
+    interfaces:
+      - name: cmd_vel
+        topic: /cmd_vel
+        message_type: geometry_msgs/msg/Twist
+        direction: command
+        required: false
+        validate_samples: false
+      - name: odometry
+        topic: /odom
+        message_type: nav_msgs/msg/Odometry
+        expected_frame_id: odom
+        expected_child_frame_id: base_footprint
+        target_hz: 30.0
+        min_hz: 24.0
+      - name: transforms
+        topic: /tf
+        message_type: tf2_msgs/msg/TFMessage
+        target_hz: 30.0
+        min_hz: 24.0
+      - name: joint_states
+        topic: /joint_states
+        message_type: sensor_msgs/msg/JointState
+        target_hz: 30.0
+        min_hz: 10.0
+      - name: hokuyo_scan
+        topic: /hokuyo_scan
+        message_type: sensor_msgs/msg/LaserScan
+        expected_frame_id: hokuyo
+        target_hz: 10.0
+        min_hz: 8.0
+      - name: front_color
+        topic: /camera_front/color/image_raw
+        message_type: sensor_msgs/msg/Image
+        expected_frame_id: camera_front_optical_frame
+        expected_width: 424
+        expected_height: 240
+        target_hz: 15.0
+        min_hz: 12.0
+      - name: front_color_info
+        topic: /camera_front/color/camera_info
+        message_type: sensor_msgs/msg/CameraInfo
+        expected_frame_id: camera_front_optical_frame
+        expected_width: 424
+        expected_height: 240
+        target_hz: 15.0
+        min_hz: 12.0
+      - name: front_depth
+        topic: /camera_front/depth/image_raw
+        message_type: sensor_msgs/msg/Image
+        expected_frame_id: camera_front_optical_frame
+        expected_width: 424
+        expected_height: 240
+        target_hz: 15.0
+        min_hz: 12.0
+      - name: front_depth_info
+        topic: /camera_front/depth/camera_info
+        message_type: sensor_msgs/msg/CameraInfo
+        expected_frame_id: camera_front_optical_frame
+        expected_width: 424
+        expected_height: 240
+        target_hz: 15.0
+        min_hz: 12.0
+      - name: rear_color
+        topic: /camera_rear/color/image_raw
+        message_type: sensor_msgs/msg/Image
+        expected_frame_id: camera_rear_optical_frame
+        expected_width: 424
+        expected_height: 240
+        target_hz: 6.0
+        min_hz: 4.0
+      - name: rear_color_info
+        topic: /camera_rear/color/camera_info
+        message_type: sensor_msgs/msg/CameraInfo
+        expected_frame_id: camera_rear_optical_frame
+        expected_width: 424
+        expected_height: 240
+        target_hz: 6.0
+        min_hz: 4.0
+      - name: zed_color
+        topic: /zed/zed_node/rgb/image_rect_color
+        message_type: sensor_msgs/msg/Image
+        expected_frame_id: zed_left_camera_optical_frame
+        expected_width: 1280
+        expected_height: 720
+        target_hz: 15.0
+        min_hz: 12.0
+      - name: zed_color_info
+        topic: /zed/zed_node/rgb/camera_info
+        message_type: sensor_msgs/msg/CameraInfo
+        expected_frame_id: zed_left_camera_optical_frame
+        expected_width: 1280
+        expected_height: 720
+        target_hz: 15.0
+        min_hz: 12.0
+      - name: zed_depth
+        topic: /zed/zed_node/depth/depth_registered
+        message_type: sensor_msgs/msg/Image
+        expected_frame_id: zed_left_camera_optical_frame
+        expected_width: 1280
+        expected_height: 720
+        target_hz: 15.0
+        min_hz: 12.0
+      - name: zed_depth_info
+        topic: /zed/zed_node/depth/camera_info
+        message_type: sensor_msgs/msg/CameraInfo
+        expected_frame_id: zed_left_camera_optical_frame
+        expected_width: 1280
+        expected_height: 720
+        target_hz: 15.0
+        min_hz: 12.0
+
+  simulation_demo:
+    extends: simulation_baseline
+    interfaces:
+      - name: zed_depth_points
+        topic: /zed/zed_node/depth/points
+        message_type: sensor_msgs/msg/PointCloud2
+        expected_frame_id: zed_left_camera_optical_frame
+        target_hz: 15.0
+        min_hz: 12.0
+
+  simulation_perception:
+    extends: simulation_demo
+    interfaces:
+      - name: lane_center
+        topic: /perception/lane_center
+        message_type: geometry_msgs/msg/PoseStamped
+        expected_frame_id: base_footprint
+        target_hz: 15.0
+        min_hz: 10.0
+
+  # The physical profile deliberately validates the canonical side of driver
+  # remappings. Fill physical_sensor_mapping.yaml with the measured driver
+  # topics and mounting transforms before using this profile on the robot.
+  physical:
+    extends: simulation_baseline

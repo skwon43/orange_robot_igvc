@@ -54,6 +54,12 @@ ament_target_dependencies(wheel_imu_odom
 )
 install(TARGETS wheel_imu_odom DESTINATION lib/${PROJECT_NAME})
 
+install(PROGRAMS
+  scripts/sensor_contract_validator.py
+  DESTINATION lib/${PROJECT_NAME}
+  RENAME sensor_contract_validator
+)
+
 install(DIRECTORY config firmware launch DESTINATION share/${PROJECT_NAME}/)
 
 ament_package()
