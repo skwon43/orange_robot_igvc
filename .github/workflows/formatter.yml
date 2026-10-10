@@ -48,11 +48,14 @@ jobs:
                 isort "$file"
                 ;;
               *.xml|*.gazebo|*.xacro|*.urdf|*.sdf)
-                xmllint --format --output "$file" "$file"
+                xmllint --noout "$file"
                 ;;
             esac
           done
 
           if ((${#changed_files[@]})); then
-            git diff --exit-code -- "${changed_files[@]}"
+            if ! git diff --exit-code -- "${changed_files[@]}"; then
+              echo "::error::Formatting changes are required. Apply the diff above and push the corrected files."
+              exit 1
+            fi
           fi
