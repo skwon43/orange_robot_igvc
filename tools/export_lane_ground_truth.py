@@ -10,7 +10,6 @@ import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-
 LINE_RE = re.compile(r"^white_line_(inner|outer)_(\d+)$")
 
 

@@ -1,11 +1,9 @@
 import math
 import unittest
 
-from orange_lane_perception.lane_geometry import (
-    estimate_lane_center,
-    intersect_ground_plane,
-    rotate_vector,
-)
+from orange_lane_perception.lane_geometry import (estimate_lane_center,
+                                                  intersect_ground_plane,
+                                                  rotate_vector)
 
 
 class LaneGeometryTest(unittest.TestCase):
@@ -20,7 +18,8 @@ class LaneGeometryTest(unittest.TestCase):
             intersect_ground_plane((0.0, 0.0, 1.0), (1.0, 0.0, -1.0)),
             (1.0, 0.0),
         )
-        self.assertIsNone(intersect_ground_plane((0.0, 0.0, 1.0), (1.0, 0.0, 1.0)))
+        self.assertIsNone(intersect_ground_plane(
+            (0.0, 0.0, 1.0), (1.0, 0.0, 1.0)))
 
     def test_lane_center_matches_parallel_boundaries(self) -> None:
         left = [(x, 2.0 + 0.1 * x) for x in (0.5, 1.0, 1.5, 2.0, 2.5)]
@@ -44,7 +43,8 @@ class LaneGeometryTest(unittest.TestCase):
         left = [(0.5, 4.0), (1.0, 4.0), (1.5, 4.0)]
         right = [(0.5, -4.0), (1.0, -4.0), (1.5, -4.0)]
         self.assertIsNone(
-            estimate_lane_center(left, right, 1.0, 3.0, 5.0, min_points_per_side=3)
+            estimate_lane_center(left, right, 1.0, 3.0,
+                                 5.0, min_points_per_side=3)
         )
 
 

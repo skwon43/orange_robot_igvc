@@ -45,23 +45,27 @@ class LanePredictionRecorder(Node):
         self.stream.flush()
 
         self.tf_buffer = Buffer()
-        self.tf_listener = TransformListener(self.tf_buffer, self, spin_thread=False)
+        self.tf_listener = TransformListener(
+            self.tf_buffer, self, spin_thread=False)
         self.subscription = self.create_subscription(
             PoseStamped,
             self.get_parameter("input_topic").value,
             self.pose_callback,
             qos_profile_sensor_data,
         )
-        self.get_logger().info(f"Recording lane predictions to {self.output_path}")
+        self.get_logger().info(
+            f"Recording lane predictions to {self.output_path}")
 
     def pose_callback(self, message: PoseStamped) -> None:
         try:
             transformed = self._transform_to_output_frame(message)
         except TransformException as error:
-            self.get_logger().warning(f"Skipping lane sample without TF: {error}")
+            self.get_logger().warning(
+                f"Skipping lane sample without TF: {error}")
             return
 
-        timestamp_ns = message.header.stamp.sec * 1_000_000_000 + message.header.stamp.nanosec
+        timestamp_ns = message.header.stamp.sec * \
+            1_000_000_000 + message.header.stamp.nanosec
         if timestamp_ns == 0:
             timestamp_ns = self.get_clock().now().nanoseconds
         self.writer.writerow(
@@ -121,8 +125,10 @@ class LanePredictionRecorder(Node):
     def _yaw(message: PoseStamped) -> float:
         orientation = message.pose.orientation
         return math.atan2(
-            2.0 * (orientation.w * orientation.z + orientation.x * orientation.y),
-            1.0 - 2.0 * (orientation.y * orientation.y + orientation.z * orientation.z),
+            2.0 * (orientation.w * orientation.z +
+                   orientation.x * orientation.y),
+            1.0 - 2.0 * (orientation.y * orientation.y +
+                         orientation.z * orientation.z),
         )
 
     def destroy_node(self) -> bool:
