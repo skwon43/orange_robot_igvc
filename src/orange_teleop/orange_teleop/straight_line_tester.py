@@ -16,10 +16,12 @@ class StraightLineTester(Node):
         self.declare_parameter("odom_topic", "/odom")
 
         self.target_speed = float(self.get_parameter("target_speed").value)
-        self.target_duration = float(self.get_parameter("target_duration").value)
+        self.target_duration = float(
+            self.get_parameter("target_duration").value)
         publish_rate = float(self.get_parameter("publish_rate").value)
         if self.target_duration <= 0.0 or publish_rate <= 0.0:
-            raise ValueError("target_duration and publish_rate must be positive")
+            raise ValueError(
+                "target_duration and publish_rate must be positive")
 
         self.publisher_ = self.create_publisher(
             Twist, self.get_parameter("cmd_vel_topic").value, 10
