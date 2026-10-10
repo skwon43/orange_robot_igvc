@@ -22,8 +22,10 @@ def generate_launch_description() -> LaunchDescription:
             DeclareLaunchArgument(
                 "camera_info_topic", default_value="/camera_front/color/camera_info"
             ),
-            DeclareLaunchArgument("output_topic", default_value="/perception/lane_center"),
-            DeclareLaunchArgument("output_path", default_value="/tmp/lane_predictions.csv"),
+            DeclareLaunchArgument(
+                "output_topic", default_value="/perception/lane_center"),
+            DeclareLaunchArgument(
+                "output_path", default_value="/tmp/lane_predictions.csv"),
             Node(
                 package="orange_lane_perception",
                 executable="lane_detector",

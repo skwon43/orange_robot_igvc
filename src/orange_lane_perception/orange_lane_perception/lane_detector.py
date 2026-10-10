@@ -7,11 +7,11 @@ import math
 from typing import Any
 
 import cv2
+import numpy as np
+import rclpy
 from cv_bridge import CvBridge, CvBridgeError
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 from geometry_msgs.msg import PoseStamped
-import numpy as np
-import rclpy
 from rclpy.duration import Duration
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
@@ -19,7 +19,8 @@ from rclpy.time import Time
 from sensor_msgs.msg import CameraInfo, Image
 from tf2_ros import Buffer, TransformException, TransformListener
 
-from .lane_geometry import estimate_lane_center, intersect_ground_plane, rotate_vector
+from .lane_geometry import (estimate_lane_center, intersect_ground_plane,
+                            rotate_vector)
 
 
 class LaneDetector(Node):
@@ -28,9 +29,11 @@ class LaneDetector(Node):
     def __init__(self) -> None:
         super().__init__("lane_detector")
         self.declare_parameter("image_topic", "/camera_front/color/image_raw")
-        self.declare_parameter("camera_info_topic", "/camera_front/color/camera_info")
+        self.declare_parameter("camera_info_topic",
+                               "/camera_front/color/camera_info")
         self.declare_parameter("output_topic", "/perception/lane_center")
-        self.declare_parameter("diagnostics_topic", "/perception/lane_diagnostics")
+        self.declare_parameter("diagnostics_topic",
+                               "/perception/lane_diagnostics")
         self.declare_parameter("debug_mask_topic", "/perception/lane_mask")
         self.declare_parameter("base_frame", "base_footprint")
         self.declare_parameter("roi_top_fraction", 0.35)
@@ -58,7 +61,8 @@ class LaneDetector(Node):
         self.camera_model: tuple[float, float, float, float] | None = None
         self.bridge = CvBridge()
         self.tf_buffer = Buffer()
-        self.tf_listener = TransformListener(self.tf_buffer, self, spin_thread=False)
+        self.tf_listener = TransformListener(
+            self.tf_buffer, self, spin_thread=False)
 
         self.image_subscription = self.create_subscription(
             Image,
@@ -95,11 +99,13 @@ class LaneDetector(Node):
         if not 0.0 <= self.roi_top_fraction < 1.0:
             raise ValueError("roi_top_fraction must be in [0, 1)")
         if self.projection_stride_px < 1 or self.min_points_per_side < 2:
-            raise ValueError("projection_stride_px must be >= 1 and min_points_per_side >= 2")
+            raise ValueError(
+                "projection_stride_px must be >= 1 and min_points_per_side >= 2")
         if not 0.0 < self.min_lookahead_m < self.max_lookahead_m:
             raise ValueError("lookahead range is invalid")
         if not self.min_lookahead_m <= self.center_lookahead_m <= self.max_lookahead_m:
-            raise ValueError("center_lookahead_m must fall within the projection range")
+            raise ValueError(
+                "center_lookahead_m must fall within the projection range")
         if not 0.0 < self.min_lane_width_m <= self.max_lane_width_m:
             raise ValueError("lane-width range is invalid")
         if not 0 <= self.white_threshold <= 255:
@@ -117,9 +123,11 @@ class LaneDetector(Node):
             self._publish_status(message, False, "waiting for CameraInfo", {})
             return
         try:
-            bgr_image = self.bridge.imgmsg_to_cv2(message, desired_encoding="bgr8")
+            bgr_image = self.bridge.imgmsg_to_cv2(
+                message, desired_encoding="bgr8")
         except CvBridgeError as error:
-            self._publish_status(message, False, f"cv_bridge conversion failed: {error}", {})
+            self._publish_status(
+                message, False, f"cv_bridge conversion failed: {error}", {})
             return
 
         mask = self._white_mask(bgr_image)
@@ -132,10 +140,12 @@ class LaneDetector(Node):
                 timeout=Duration(seconds=0.10),
             )
         except TransformException as error:
-            self._publish_status(message, False, f"missing TF to {self.base_frame}: {error}", {})
+            self._publish_status(
+                message, False, f"missing TF to {self.base_frame}: {error}", {})
             return
 
-        left_points, right_points, projected_count = self._project_lane_pixels(mask, transform)
+        left_points, right_points, projected_count = self._project_lane_pixels(
+            mask, transform)
         estimate = estimate_lane_center(
             left_points,
             right_points,
@@ -151,7 +161,8 @@ class LaneDetector(Node):
             "right_points": len(right_points),
         }
         if estimate is None:
-            self._publish_status(message, False, "insufficient or implausible lane boundaries", details)
+            self._publish_status(
+                message, False, "insufficient or implausible lane boundaries", details)
             return
 
         pose = PoseStamped()
@@ -185,7 +196,8 @@ class LaneDetector(Node):
         translation = transform.transform.translation
         rotation_msg = transform.transform.rotation
         origin = (translation.x, translation.y, translation.z)
-        rotation = (rotation_msg.x, rotation_msg.y, rotation_msg.z, rotation_msg.w)
+        rotation = (rotation_msg.x, rotation_msg.y,
+                    rotation_msg.z, rotation_msg.w)
         left_points: list[tuple[float, float]] = []
         right_points: list[tuple[float, float]] = []
         projected_count = 0
@@ -198,7 +210,8 @@ class LaneDetector(Node):
                 (float(pixel_y) - cy) / fy,
                 1.0,
             )
-            ground_point = intersect_ground_plane(origin, rotate_vector(optical_ray, rotation))
+            ground_point = intersect_ground_plane(
+                origin, rotate_vector(optical_ray, rotation))
             if ground_point is None:
                 continue
             x_m, y_m = ground_point
@@ -225,7 +238,8 @@ class LaneDetector(Node):
         status.level = DiagnosticStatus.OK if valid else DiagnosticStatus.WARN
         status.message = text
         values = {"detection_valid": str(valid).lower(), **details}
-        status.values = [KeyValue(key=key, value=str(value)) for key, value in values.items()]
+        status.values = [KeyValue(key=key, value=str(value))
+                         for key, value in values.items()]
         array = DiagnosticArray()
         array.header = image.header
         array.status = [status]

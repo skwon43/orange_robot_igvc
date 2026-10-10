@@ -7,8 +7,8 @@ import csv
 import math
 from pathlib import Path
 
-from geometry_msgs.msg import PoseStamped
 import rclpy
+from geometry_msgs.msg import PoseStamped
 from rclpy.duration import Duration
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
