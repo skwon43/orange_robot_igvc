@@ -1,9 +1,10 @@
 import math
 import unittest
 
-from orange_lane_perception.lane_geometry import (estimate_lane_center,
-                                                  intersect_ground_plane,
-                                                  rotate_vector)
+from orange_lane_perception.lane_geometry import (
+    LaneEstimate, blend_lane_estimates, estimate_lane_center,
+    estimate_lane_center_from_boundaries, intersect_ground_plane,
+    rotate_vector)
 
 
 class LaneGeometryTest(unittest.TestCase):
@@ -46,6 +47,38 @@ class LaneGeometryTest(unittest.TestCase):
             estimate_lane_center(left, right, 1.0, 3.0,
                                  5.0, min_points_per_side=3)
         )
+
+    def test_single_left_boundary_uses_nominal_width_when_enabled(self) -> None:
+        left = [(x, 2.0 + 0.1 * x) for x in (0.5, 1.0, 1.5, 2.0)]
+        estimate = estimate_lane_center_from_boundaries(
+            left,
+            [],
+            lookahead_m=1.5,
+            min_lane_width_m=3.0,
+            max_lane_width_m=5.0,
+            min_points_per_side=3,
+            nominal_lane_width_m=4.0,
+            allow_single_boundary=True,
+        )
+        self.assertIsNotNone(estimate)
+        assert estimate is not None
+        self.assertAlmostEqual(estimate.y_m, 0.15)
+        self.assertEqual(estimate.boundary_mode, "left_inferred")
+
+    def test_single_boundary_is_rejected_without_explicit_permission(self) -> None:
+        left = [(0.5, 2.0), (1.0, 2.0), (1.5, 2.0)]
+        self.assertIsNone(
+            estimate_lane_center_from_boundaries(
+                left, [], 1.0, 3.0, 5.0, 3, 4.0, False
+            )
+        )
+
+    def test_blend_interpolates_centerline(self) -> None:
+        previous = LaneEstimate(1.5, 0.0, 0.0, 4.0, 20, 20)
+        current = LaneEstimate(1.5, 1.0, math.pi / 2, 4.0, 20, 20)
+        blended = blend_lane_estimates(previous, current, 0.25)
+        self.assertAlmostEqual(blended.y_m, 0.25)
+        self.assertAlmostEqual(blended.heading_rad, math.atan2(0.25, 0.75))
 
 
 if __name__ == "__main__":

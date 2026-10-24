@@ -11,6 +11,7 @@ src/
   orange_teleop/        Teleoperation nodes and launch files
   orange_sensor_tools/  C++ sensor processing nodes and sensor configs
   orange_lane_perception/ ROS 2 lane-perception baseline and CSV recorder
+  orange_autonomy/      Lane-guided local planner, safety controller, mission monitor
   orange_bringup/       Real-robot drivers and localization utilities
   orange_navigation/     Navigation configuration and launch files
   orange_slam/           SLAM configuration and launch files
@@ -31,6 +32,7 @@ The supported simulation path targets ROS 2 Humble and Gazebo Fortress:
 
 - `orange_gazebo orange_sensor_demo.launch.xml`: complete sensor-demo checkpoint
 - `orange_gazebo orange_igvc_baseline.launch.xml`: minimal simulator and bridge baseline
+- `orange_autonomy autonomous_course.launch.py`: complete autonomous-course baseline
 
 The following launch files are retained for compatibility with older robot or Gazebo Classic workflows. They are not part of the Fortress checkpoint and may require external packages that are not installed by the simulation Docker image:
 
@@ -55,13 +57,15 @@ Run these commands inside the simulation container after source changes:
 ```bash
 source /opt/ros/humble/setup.bash
 colcon list
-colcon build --symlink-install --packages-up-to orange_gazebo orange_teleop orange_lane_perception
+colcon build --symlink-install --packages-up-to orange_autonomy
 source install/setup.bash
 ros2 launch orange_gazebo orange_igvc_baseline.launch.xml
 ros2 launch orange_gazebo orange_sensor_demo.launch.xml
 ros2 launch orange_sensor_tools sensor_contract_validation.launch.xml profile:=simulation_demo
 ros2 launch orange_lane_perception lane_perception.launch.py
 ros2 launch orange_sensor_tools sensor_contract_validation.launch.xml profile:=simulation_perception
+ros2 launch orange_autonomy autonomous_course.launch.py autostart:=false
+ros2 launch orange_sensor_tools sensor_contract_validation.launch.xml profile:=simulation_autonomy
 ```
 
 Use `docs/SIM_BASELINE.md` and `docs/SENSOR_DEMO_CHECKPOINT.md` for the expected environment and sensor contract.
@@ -71,3 +75,8 @@ Use `docs/SENSOR_INTERFACE_CONTRACT.md` for the executable contract checks and c
 observations into `/perception/lane_center` and records comparable `odom` CSV
 predictions. It may improve the detector internals, but must preserve the
 published topic, message type, and frame contract.
+
+`orange_autonomy` owns the closed-loop conversion from lane and LaserScan
+observations to `/cmd_vel`, safety watchdog behavior, and course completion
+state. It consumes the canonical interfaces instead of simulator-specific
+Gazebo data so the same control path can later run on physical sensors.

@@ -103,8 +103,8 @@
   <link name="rear_sensor">
     <visual><geometry><box size="0.1 0.1 0.1"/></geometry><material name="yellow"/></visual>
   </link>
-  <xacro:sensor_hokuyo name="hokuyo" parent="rear_sensor" min_angle="-1.22" max_angle="1.22" samples="720">
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+  <xacro:sensor_hokuyo name="hokuyo" parent="base_link" min_angle="-1.22" max_angle="1.22" samples="720">
+    <origin xyz="0.52 0 0.84" rpy="0 0 0"/>
   </xacro:sensor_hokuyo>
 
   <!--
@@ -130,7 +130,7 @@
       height="240"
       update_rate="15"
       hfov="1.50">
-    <origin xyz="0.42 0.0 1.48" rpy="0 1.2915 0"/>
+    <origin xyz="0.42 0.0 1.48" rpy="0 1.05 0"/>
   </xacro:sensor_rgb_camera>
 
   <xacro:sensor_depth_camera
