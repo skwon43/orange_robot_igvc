@@ -1,4 +1,4 @@
-﻿# Sensor and Perception Validation Update
+# Sensor and Perception Validation Update
 
 **Date:** 2026-10-09
 **Scope:** Sensor integration, ROS 2 topic/frame validation, simulation-to-physical mapping, and quantitative lane/perception comparison.
@@ -86,6 +86,17 @@ the exact CSV schema consumed by `tools/evaluate_lane_perception.py`. The
 detector is deliberately a transparent validation baseline, not a claim of
 competition-ready lane perception. Any later model-based replacement must keep
 the published topic, message type, and frame contract.
+
+### Data-independent robustness candidates
+
+The lane detector now exposes experimental modes that do not require new
+training data: locally adaptive HLS masking, optional edge support, nominal-
+width recovery from one visible boundary, temporal smoothing, and a
+publish-confidence gate. Their defaults preserve the original fixed-white,
+two-boundary, frame-by-frame baseline. Each run records its selected mode and
+the `boundary_mode`, `temporal_filter_applied`, and heuristic
+`detection_confidence` in `/perception/lane_diagnostics`, making quantitative
+comparison possible without changing the interface contract.
 
 ## Verification Completed
 

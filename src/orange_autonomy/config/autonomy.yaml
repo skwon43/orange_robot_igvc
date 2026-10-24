@@ -1,0 +1,54 @@
+autonomy_controller:
+  ros__parameters:
+    enabled: true
+
+    lane_topic: /perception/lane_center
+    lane_diagnostics_topic: /perception/lane_diagnostics
+    scan_topic: /hokuyo_scan
+    odom_topic: /odom
+    cmd_vel_topic: /cmd_vel
+    lane_frame: base_footprint
+
+    control_frequency_hz: 10.0
+    lane_timeout_sec: 0.80
+    scan_timeout_sec: 0.50
+    odom_timeout_sec: 0.75
+    minimum_scan_valid_fraction: 0.50
+    scan_angle_offset_rad: 0.0
+
+    # The simulated chassis is 0.70 m wide. The 0.55 m half-corridor leaves
+    # approximately 0.20 m of obstacle margin on each side.
+    obstacle_lookahead_m: 4.0
+    corridor_half_width_m: 0.55
+    nominal_lane_width_m: 4.0
+    lane_constraint_horizon_m: 1.5
+    stop_distance_m: 0.75
+    slowdown_distance_m: 2.50
+
+    max_heading_rad: 0.85
+    candidate_count: 19
+    lane_weight: 4.0
+    clearance_weight: 5.0
+    turn_weight: 0.35
+    switching_weight: 0.45
+    lateral_gain: 1.0
+    heading_gain: 0.8
+
+    max_linear_speed_mps: 0.85
+    min_linear_speed_mps: 0.12
+    max_angular_speed_rps: 0.90
+    angular_gain: 1.5
+    blocked_turn_speed_rps: 0.35
+    linear_acceleration_mps2: 0.45
+    linear_deceleration_mps2: 1.20
+    angular_acceleration_rps2: 1.80
+
+    # The generated centerline is about 92 m long. Requiring 70 m plus a
+    # return to the start region prevents an early false finish.
+    minimum_completion_distance_m: 70.0
+    departure_radius_m: 5.0
+    finish_radius_m: 2.5
+    maximum_odom_step_m: 1.0
+    status_publish_period_sec: 0.50
+    summary_path: /tmp/autonomy_run_summary.json
+    reference_course_length_m: 92.167

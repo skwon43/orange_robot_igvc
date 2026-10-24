@@ -136,6 +136,22 @@ The pose reports the centerline at a fixed 1.5 m lookahead. It is a baseline
 for interface and metric work, not a final competition detector. It must be
 re-tuned or replaced only behind the same output topic and frame contract.
 
+The default `fixed_white` mask is the original RGB threshold baseline. It is
+retained for A/B comparison. `adaptive_hls` applies local contrast enhancement
+to HLS lightness, then selects locally bright, low-saturation pixels. It is a
+shadow/illumination robustness candidate, not a learned semantic segmenter, and
+must be evaluated against the fixed baseline before it becomes the default.
+
+`adaptive_hls_edges` additionally retains low-saturation local-contrast edges.
+For controlled robustness trials, the detector can infer a centerline from one
+visible boundary (`allow_single_boundary:=true`), smooth consecutive valid
+estimates (`temporal_alpha` below `1.0`), and suppress outputs below an
+explicit heuristic support threshold (`min_publish_confidence`). These are all
+off by default so the reference baseline remains reproducible. Diagnostics
+report `boundary_mode`, `temporal_filter_applied`, and
+`detection_confidence`; the confidence is a support heuristic, not a calibrated
+probability.
+
 Start it after the sensor demo. The recorder transforms each valid local pose
 to `odom` and writes exactly the prediction CSV accepted by the evaluator.
 
@@ -144,6 +160,20 @@ ros2 launch orange_gazebo orange_sensor_demo.launch.xml
 
 ros2 launch orange_lane_perception lane_perception.launch.py \
   output_path:=/tmp/lane_predictions.csv
+
+# Candidate for shadow/illumination robustness.
+ros2 launch orange_lane_perception lane_perception.launch.py \
+  mask_mode:=adaptive_hls \
+  output_path:=/tmp/lane_predictions_adaptive.csv
+
+# Candidate for partial occlusion and illumination robustness. Evaluate this
+# separately from the reference baseline rather than replacing it silently.
+ros2 launch orange_lane_perception lane_perception.launch.py \
+  mask_mode:=adaptive_hls_edges \
+  allow_single_boundary:=true \
+  temporal_alpha:=0.35 \
+  min_publish_confidence:=0.45 \
+  output_path:=/tmp/lane_predictions_robust.csv
 
 ros2 launch orange_sensor_tools sensor_contract_validation.launch.xml \
   profile:=simulation_perception \

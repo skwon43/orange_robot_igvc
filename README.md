@@ -55,7 +55,7 @@ terminal:
 
 ```bash
 docker compose -f compose.sim.yaml run --rm sim bash -lc \
-  "source /opt/ros/humble/setup.bash && colcon build --symlink-install --packages-up-to orange_gazebo orange_teleop orange_lane_perception"
+  "source /opt/ros/humble/setup.bash && colcon build --symlink-install --packages-up-to orange_autonomy"
 igvc-demo
 ```
 
@@ -73,7 +73,7 @@ cd /workspace
 
 colcon build \
   --symlink-install \
-  --packages-up-to orange_gazebo orange_teleop orange_lane_perception
+  --packages-up-to orange_autonomy
 
 source install/setup.bash
 ```
@@ -137,6 +137,9 @@ Primary ROS topics include:
 /perception/lane_center
 /perception/lane_diagnostics
 /perception/lane_mask
+
+/autonomy/diagnostics
+/autonomy/finished
 ```
 
 The ZED depth point cloud is reconstructed with `depth_image_proc` from the bridged depth image and CameraInfo so that the PointCloud2 follows the ROS optical-frame convention.
@@ -149,6 +152,22 @@ For the lower-level simulator / bridge baseline without the additional RViz and 
 ros2 launch orange_gazebo orange_igvc_baseline.launch.xml
 ```
 
+## Autonomous Course Launch
+
+Build `orange_autonomy`, then start the simulator, robust lane perception,
+obstacle-aware local planner, controller, and completion monitor together:
+
+```bash
+ros2 launch orange_autonomy autonomous_course.launch.py autostart:=false
+```
+
+After checking `/perception/lane_center`, `/hokuyo_scan`, and
+`/autonomy/diagnostics`, enable motion:
+
+```bash
+ros2 service call /autonomy/set_enabled std_srvs/srv/SetBool "{data: true}"
+```
+
 ## Detailed Documentation
 
 See:
@@ -158,8 +177,10 @@ See:
 - [`docs/SENSOR_DEMO_CHECKPOINT.md`](docs/SENSOR_DEMO_CHECKPOINT.md) — frozen September 5, 2026 student-shareable sensor-demo checkpoint
 - [`docs/SENSOR_INTERFACE_CONTRACT.md`](docs/SENSOR_INTERFACE_CONTRACT.md) — canonical sensor/TF contract, physical mapping procedure, and lane-evaluation workflow
 - [`docs/SENSOR_VALIDATION_UPDATE.md`](docs/SENSOR_VALIDATION_UPDATE.md) — implementation report, verification evidence, and remaining validation work
+- [`docs/PROFESSOR_PROGRESS_UPDATE_2026-10-23.md`](docs/PROFESSOR_PROGRESS_UPDATE_2026-10-23.md) - current professor-facing status, verified changes, limitations, and next milestones
 - [`docs/SIM_BASELINE.md`](docs/SIM_BASELINE.md) — reproducible Docker / ROS 2 / Gazebo baseline and validation history
 - [`docs/IGVC_2026_COURSE_SPEC.md`](docs/IGVC_2026_COURSE_SPEC.md) — deterministic 2026 IGVC course specification
+- [`docs/AUTONOMOUS_COURSE.md`](docs/AUTONOMOUS_COURSE.md) - lane-guided obstacle avoidance, autonomous launch, safety, and validation
 - [`docs/ORANGE_ROS2_UPSTREAM.md`](docs/ORANGE_ROS2_UPSTREAM.md) — upstream Orange ROS 2 package documentation
 
 ## Development

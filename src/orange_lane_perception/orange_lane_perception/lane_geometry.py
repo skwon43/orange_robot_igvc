@@ -17,6 +17,7 @@ class LaneEstimate:
     lane_width_m: float
     left_points: int
     right_points: int
+    boundary_mode: str = "both"
 
 
 def rotate_vector(
@@ -116,24 +117,98 @@ def estimate_lane_center(
 ) -> LaneEstimate | None:
     """Estimate a local centerline from the left and right lane boundaries."""
 
+    return estimate_lane_center_from_boundaries(
+        left_points,
+        right_points,
+        lookahead_m,
+        min_lane_width_m,
+        max_lane_width_m,
+        min_points_per_side,
+        nominal_lane_width_m=None,
+        allow_single_boundary=False,
+    )
+
+
+def estimate_lane_center_from_boundaries(
+    left_points: Iterable[tuple[float, float]],
+    right_points: Iterable[tuple[float, float]],
+    lookahead_m: float,
+    min_lane_width_m: float,
+    max_lane_width_m: float,
+    min_points_per_side: int,
+    nominal_lane_width_m: float | None,
+    allow_single_boundary: bool,
+) -> LaneEstimate | None:
+    """Estimate the centerline, optionally inferring it from one boundary.
+
+    One-boundary recovery is deliberately opt-in: it uses the configured nominal
+    lane width and is less certain than a measurement from both boundaries.
+    """
+
     left = list(left_points)
     right = list(right_points)
     left_fit = fit_line_y_from_x(left, min_points_per_side)
     right_fit = fit_line_y_from_x(right, min_points_per_side)
-    if left_fit is None or right_fit is None:
+    if left_fit is None and right_fit is None:
         return None
 
-    left_y = left_fit[0] * lookahead_m + left_fit[1]
-    right_y = right_fit[0] * lookahead_m + right_fit[1]
-    lane_width = left_y - right_y
-    if not min_lane_width_m <= lane_width <= max_lane_width_m:
+    if left_fit is not None and right_fit is not None:
+        left_y = left_fit[0] * lookahead_m + left_fit[1]
+        right_y = right_fit[0] * lookahead_m + right_fit[1]
+        lane_width = left_y - right_y
+        if not min_lane_width_m <= lane_width <= max_lane_width_m:
+            return None
+        center_y = (left_y + right_y) * 0.5
+        heading = math.atan((left_fit[0] + right_fit[0]) * 0.5)
+        boundary_mode = "both"
+    elif not allow_single_boundary or nominal_lane_width_m is None:
         return None
+    elif left_fit is not None:
+        left_y = left_fit[0] * lookahead_m + left_fit[1]
+        lane_width = nominal_lane_width_m
+        center_y = left_y - lane_width * 0.5
+        heading = math.atan(left_fit[0])
+        boundary_mode = "left_inferred"
+    else:
+        assert right_fit is not None
+        right_y = right_fit[0] * lookahead_m + right_fit[1]
+        lane_width = nominal_lane_width_m
+        center_y = right_y + lane_width * 0.5
+        heading = math.atan(right_fit[0])
+        boundary_mode = "right_inferred"
 
     return LaneEstimate(
         x_m=lookahead_m,
-        y_m=(left_y + right_y) * 0.5,
-        heading_rad=math.atan((left_fit[0] + right_fit[0]) * 0.5),
+        y_m=center_y,
+        heading_rad=heading,
         lane_width_m=lane_width,
         left_points=len(left),
         right_points=len(right),
+        boundary_mode=boundary_mode,
+    )
+
+
+def blend_lane_estimates(
+    previous: LaneEstimate, current: LaneEstimate, current_weight: float
+) -> LaneEstimate:
+    """Blend centerline poses without wrapping errors around +/- pi."""
+
+    weight = min(1.0, max(0.0, current_weight))
+    previous_weight = 1.0 - weight
+    heading = math.atan2(
+        previous_weight * math.sin(previous.heading_rad)
+        + weight * math.sin(current.heading_rad),
+        previous_weight * math.cos(previous.heading_rad)
+        + weight * math.cos(current.heading_rad),
+    )
+    return LaneEstimate(
+        x_m=previous_weight * previous.x_m + weight * current.x_m,
+        y_m=previous_weight * previous.y_m + weight * current.y_m,
+        heading_rad=heading,
+        lane_width_m=(
+            previous_weight * previous.lane_width_m + weight * current.lane_width_m
+        ),
+        left_points=current.left_points,
+        right_points=current.right_points,
+        boundary_mode=current.boundary_mode,
     )

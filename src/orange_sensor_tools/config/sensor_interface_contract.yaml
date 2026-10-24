@@ -147,6 +147,28 @@ profiles:
         target_hz: 15.0
         min_hz: 10.0
 
+  simulation_autonomy:
+    extends: simulation_perception
+    interfaces:
+      - name: cmd_vel
+        topic: /cmd_vel
+        message_type: geometry_msgs/msg/Twist
+        direction: command
+        required: true
+        validate_samples: true
+        target_hz: 10.0
+        min_hz: 8.0
+      - name: autonomy_diagnostics
+        topic: /autonomy/diagnostics
+        message_type: diagnostic_msgs/msg/DiagnosticArray
+        target_hz: 2.0
+        min_hz: 1.5
+      - name: autonomy_finished
+        topic: /autonomy/finished
+        message_type: std_msgs/msg/Bool
+        required: false
+        validate_samples: false
+
   # The physical profile deliberately validates the canonical side of driver
   # remappings. Fill physical_sensor_mapping.yaml with the measured driver
   # topics and mounting transforms before using this profile on the robot.
